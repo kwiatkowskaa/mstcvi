@@ -1,5 +1,3 @@
-
-
 import numpy as np
 
 from .mst_utils import get_euclidean_mst, mst_partition_edges
@@ -34,11 +32,11 @@ def treelhouette_samples(X, labels, *, M=0, **mst_euclid_kwargs):
 
     Returns
     -------
-    t : ndarray, shape (n - k,)
+    t : ndarray, shape (n - k,)                                          NOTE to nie jest n - k!!!
         Treelhouette length of each within-cluster MST edge.
-    edge_labels : ndarray, shape (n - k,)
-        Cluster id (0..k-1) of each within-cluster edge.
     """
+
+    X, labels = _validate_params(X, labels)
 
     k = len(np.unique(labels))
 
@@ -71,7 +69,7 @@ def treelhouette_samples(X, labels, *, M=0, **mst_euclid_kwargs):
     t[cond_lt] = 1.0 - (a[cond_lt] / b[cond_lt])
     t[cond_gt] = (b[cond_gt] / a[cond_gt]) - 1.0
 
-    return t, edge_labels
+    return t
 
 
 def treelhouette_score(X, labels, *, M=0, **mst_euclid_kwargs):
@@ -96,9 +94,7 @@ def treelhouette_score(X, labels, *, M=0, **mst_euclid_kwargs):
 
     """
 
-    X, labels = _validate_params(X, labels)
-
-    t, _ = treelhouette_samples(X, labels, M=M, **mst_euclid_kwargs)
+    t = treelhouette_samples(X, labels, M=M, **mst_euclid_kwargs)
 
     return float(np.mean(t))
 
