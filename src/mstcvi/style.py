@@ -21,8 +21,8 @@ MARKER_SHAPES = ["o", "s", "^", "D", "P"]  # koło, kwadrat, trójkąt, romb, tr
 
 
 # --- Semantic colours ----------------------------------------------
-CUT_EDGE_COLOR = "#f10000"    # b_i
-MEAN_LINE_COLOR = "#f10000"   # treelhouette_score
+CUT_EDGE_COLOR = "#FF2400"    # b_i
+MEAN_LINE_COLOR = "#FF2400"   # treelhouette_score
 
 
 def cluster_color(position: int) -> str:

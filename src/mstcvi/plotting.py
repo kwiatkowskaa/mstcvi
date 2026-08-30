@@ -8,7 +8,7 @@ from .indices import treelhouette_samples
 from .style import CUT_EDGE_COLOR, MEAN_LINE_COLOR, cluster_color, cluster_marker
 
 
-def plot_mst_2d(X, labels, *, ax=None, show_mst=False, use_markers=True, point_size=30, 
+def plot_scatter(X, labels, *, ax=None, show_mst=False, use_markers=True, point_size=30, 
                 M=0, mst_euclid_kwargs=None):
     """Scatter plot of 2D points with the MST overlaid.
 
@@ -33,7 +33,7 @@ def plot_mst_2d(X, labels, *, ax=None, show_mst=False, use_markers=True, point_s
     ax : matplotlib.axes.Axes
     """
     if X.shape[1] != 2:
-        raise ValueError(f"plot_mst_2d needs 2D points, got shape {X.shape}")
+        raise ValueError(f"plot_scatter needs 2D points, got shape {X.shape}")
 
 
     own_figure = ax is None
@@ -104,16 +104,19 @@ def plot_treelhouette(X, labels, *, ax=None, show_cluster_scores=True, M=0, **ms
 
     y0 = 0
 
-    for pos, lab in enumerate(np.unique(within_edge_labels)):
+    for lab in np.unique(within_edge_labels):
         mask = within_edge_labels == lab
         vals = np.sort(t[mask])[::1]
         n_edges = len(vals)
 
         y = np.arange(y0, y0 + n_edges)
-        ax.barh(y, vals, height=1.0, align="edge", color=cluster_color(pos))
+        ax.barh(y, vals, height=1.0, align="edge", color=cluster_color(lab))
+
+        total_edges = len(within_edge_labels)
+        gap = max(1, round(total_edges * 0.03))
 
         y0_start = y0
-        y0 += n_edges + 40
+        y0 += n_edges + gap
 
         if show_cluster_scores:
             cluster_mean = float(np.mean(vals))
@@ -128,7 +131,7 @@ def plot_treelhouette(X, labels, *, ax=None, show_cluster_scores=True, M=0, **ms
                 verticalalignment="top",
                 horizontalalignment="left",
                 fontsize=8,
-                color=cluster_color(pos)
+                color=cluster_color(lab)
             )
             
     ax.axvline(score, color=MEAN_LINE_COLOR, linewidth=1.5, linestyle="--")
@@ -136,7 +139,7 @@ def plot_treelhouette(X, labels, *, ax=None, show_cluster_scores=True, M=0, **ms
     if show_cluster_scores:
         ax.text(
             1.02,
-            -0.20,
+            -1.00,
             r"$C_j$: $n_j$ | avg $t_i$",
             transform=ax.get_yaxis_transform(),
             verticalalignment="top",

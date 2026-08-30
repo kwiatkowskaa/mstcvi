@@ -21,7 +21,7 @@ class BenchmarkDataset(NamedTuple):
     reference_labels: list[np.ndarray]  # l >= 1 reference labels
 
 
-def iter_benchmark_datasets(batteries) -> Iterator[BenchmarkDataset]:
+def iter_benchmark_datasets(batteries, DATA_PATH=DATA_PATH) -> Iterator[BenchmarkDataset]:
     """
     Iterates over clustering benchmark datasets from specified batteries.
     

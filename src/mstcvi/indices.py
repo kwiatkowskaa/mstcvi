@@ -3,7 +3,7 @@ import numpy as np
 from .mst_utils import get_euclidean_mst, mst_partition_edges
 
 
-def treelhouette_samples(X, labels, *, M=0, **mst_euclid_kwargs):
+def treelhouette_samples(X, labels, *, mst_dist=None, mst_index=None, M=0, **mst_euclid_kwargs):
     """Compute the Treelhouette Coefficient for each within-cluster MST edge.
 
     For every MST edge lying within a cluster, define:
@@ -24,6 +24,12 @@ def treelhouette_samples(X, labels, *, M=0, **mst_euclid_kwargs):
         Input points.
     labels : ndarray, shape (n,)
         Cluster label of each point.
+    mst_dist : ndarray, shape (n - 1,), optional
+        Precomputed weight of each MST edge. 
+        If provided alongside `mst_index`, avoids recomputing the MST.
+    mst_index : ndarray, shape (n - 1, 2), optional
+        Precomputed endpoints of each MST edge.
+        If provided alongside `mst_dist`, avoids recomputing the MST.
     M : int, default=0
         Forwarded to ``quitefastmst.mst_euclid`` (mutual reachability
         smoothing factor; M=0 gives the plain Euclidean MST).
@@ -36,13 +42,18 @@ def treelhouette_samples(X, labels, *, M=0, **mst_euclid_kwargs):
         Treelhouette length of each within-cluster MST edge.
     """
 
-    X, labels = _validate_params(X, labels)
+    # TODO dodaj walidacje mst_dist i mst_index
+
+    if mst_dist is None or mst_index is None:
+        if X is None:
+            raise ValueError(
+                "Either 'X' or both 'mst_dist' and 'mst_index' must be provided."
+            )
+        
+        X, labels = _validate_params(X, labels)
+        mst_dist, mst_index = get_euclidean_mst(X, M=M, **mst_euclid_kwargs)
 
     k = len(np.unique(labels))
-
-    mst_dist, mst_index = get_euclidean_mst(
-        X, M=M, **mst_euclid_kwargs
-        )
 
     same_cluster, edge_labels, cut_endpoint_labels = mst_partition_edges(
         mst_dist, mst_index, labels
@@ -72,7 +83,7 @@ def treelhouette_samples(X, labels, *, M=0, **mst_euclid_kwargs):
     return t
 
 
-def treelhouette_score(X, labels, *, M=0, **mst_euclid_kwargs):
+def treelhouette_score(X, labels, *, mst_dist=None, mst_index=None, M=0, **mst_euclid_kwargs):
     """Compute the mean Treelhouette for each within-cluster MST edge.
 
     Parameters
@@ -81,6 +92,12 @@ def treelhouette_score(X, labels, *, M=0, **mst_euclid_kwargs):
         Input points.
     labels : ndarray, shape (n,)
         Cluster label of each point.
+    mst_dist : ndarray, shape (n - 1,), optional
+        Precomputed weight of each MST edge. 
+        If provided alongside `mst_index`, avoids recomputing the MST.
+    mst_index : ndarray, shape (n - 1, 2), optional
+        Precomputed endpoints of each MST edge.
+        If provided alongside `mst_dist`, avoids recomputing the MST.
     M : int, default=0
         Forwarded to ``quitefastmst.mst_euclid`` (mutual reachability
         smoothing factor; M=0 gives the plain Euclidean MST).
@@ -94,7 +111,7 @@ def treelhouette_score(X, labels, *, M=0, **mst_euclid_kwargs):
 
     """
 
-    t = treelhouette_samples(X, labels, M=M, **mst_euclid_kwargs)
+    t = treelhouette_samples(X, labels, mst_dist=mst_dist, mst_index=mst_index, M=M, **mst_euclid_kwargs)
 
     return float(np.mean(t))
 
