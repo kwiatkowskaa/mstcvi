@@ -18,6 +18,9 @@ figures/
 *.pdf
 experiments/data/
 data/
+experiments/results/
+*.pkl
+*.csv
 
 # IDE configs
 .vscode/

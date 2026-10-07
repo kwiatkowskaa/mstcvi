@@ -38,7 +38,7 @@ def treelhouette_samples(X, labels, *, mst_dist=None, mst_index=None, M=0, **mst
 
     Returns
     -------
-    t : ndarray, shape (n - k,)                                          NOTE to nie jest n - k!!!
+    t : ndarray
         Treelhouette length of each within-cluster MST edge.
     """
 
